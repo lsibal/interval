@@ -54,24 +54,49 @@ class Interval
         out << a - i
       end
     end.flatten
-    # res = [].tap { |out| ((b.reject { |i| p 1; b.count(i) < x }).compact.uniq(&:to_s)).each { |i| p 2; out << a - i } }.flatten
     res.one? ? res.first : res
   end
 
   def self.p2(intervals)
     [].tap do |out|
-      intervals.sort { |a, b| a.start <=> b.start }.each_with_index do |int, idx|
-        p2_prepare([], intervals[idx..-1], out)
+      sorted = intervals.sort do |l, r|
+        return 0 if l == r
+        cl, cr = l.start == r.start ? [l.end, r.end] : [l.start, r.start]
+        time_string_compare(:<, cl, cr) ? -1 : 1
+      end
+      sorted.each_with_index do |int, idx|
+        p2_prepare([int], sorted[idx+1..-1], out) unless out.any? { |o| o.include? int }
       end
     end.uniq.reject { |x| x.empty? }
   end
 
   def self.p2_prepare(tmp, intervals, out)
-    intervals.each_with_index do |int, idx|
-      if tmp.empty? || time_string_compare(:<=, tmp.last.end, int.start)
-        p2_prepare(tmp + [int], intervals[idx+1..-1], out)
+    return if out.any? { |o| tmp.all? { |t| o.include? t } } # can safely prune here
+    idx = 0
+    while idx < intervals.size
+      int = intervals[idx]
+      temp_idx = idx
+      new_tmp = tmp
+      last_time = tmp.last.end
+      series = []
+      while temp_idx < intervals.size
+        c = intervals[temp_idx]
+        break unless time_string_compare(:<=, last_time, c.start)
+        series << c
+        last_time = c.end
+        temp_idx += 1
       end
+      if temp_idx > idx
+        new_tmp = tmp + series
+        next_intervals = intervals[temp_idx..-1]
+        if next_intervals.any?
+          p2_prepare(new_tmp, next_intervals, out) 
+        elsif out.none? { |o| new_tmp.all? { |t| o.include? t } }
+          out.concat [new_tmp]
+        end
+      end
+      idx = [temp_idx, idx + 1].max
     end
-    out.concat([tmp]) unless out.any? { |o| tmp.all? { |t| o.include? t } }
+    out.concat [tmp] unless out.any? { |o| tmp.all? { |t| o.include? t } }
   end
 end

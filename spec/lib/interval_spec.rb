@@ -85,18 +85,20 @@ describe Interval do
       it { should eq Interval.new(5,26) }
     end
 
-    it "should be fast" do
-      size = 100000
-      xs = gen_intervals(0, 1440, size)
-      is = xs.map { |x| Interval.new(x[0], x[1])}
-      time = Benchmark.measure do
-        n = 5
-        a = is.shift
-        b = is
-        r = Interval.p1(a, b, n)
+    context 'performance' do
+      it "should be fast" do
+        size = 100000
+        xs = gen_intervals(0, 1440, size)
+        is = xs.map { |x| Interval.new(x[0], x[1])}
+        time = Benchmark.measure do
+          n = 5
+          a = is.shift
+          b = is
+          r = Interval.p1(a, b, n)
+        end
+        expect(time.total).to be < 4
+        puts "Interval.p1 finished in #{'%.2f' % time.total}s"
       end
-      expect(time.total).to be < 4
-      puts "Interval.p1 finished in #{'%.2f' % time.total}s"
     end
   end
 
@@ -119,15 +121,17 @@ describe Interval do
                      ] }
     end
 
-    it "should be fast" do
-      size = 100
-      xs = gen_string_times(0, 1440, size)
-      r = []
-      time = Benchmark.measure do
-        r = Interval.p2(xs)
+    context 'performance' do
+      it "should be fast" do
+        size = 100
+        xs = gen_string_times(0, 1440, size)
+        r = []
+        time = Benchmark.measure do
+          r = Interval.p2(xs)
+        end
+        expect(time.total).to be < 4
+        puts "Interval.p2 finished in #{'%.2f' % time.total}s"
       end
-      expect(time.total).to be < 4
-      puts "Interval.p2 finished in #{'%.2f' % time.total}s"
     end
   end
 

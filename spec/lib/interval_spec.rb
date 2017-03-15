@@ -118,7 +118,7 @@ describe Interval do
     end
 
     it "should be fast" do
-      size = 100
+      size = 1000
       xs = gen_string_times(0, 1440, size)
       r = []
       time = Benchmark.measure do

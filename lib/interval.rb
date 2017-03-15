@@ -39,7 +39,22 @@ class Interval
   end
 
   def self.p1(a, b, x)
-    res = [].tap { |out| ((b.reject { |i| b.count(i) < x }).compact.uniq(&:to_s)).each { |i| out << a - i } }.flatten
+    res = [].tap do |out|
+      tmp = b.sort { |l, r| l.start == r.start ? l.end <=> r.end : l.start <=> r.start }
+      rej = []
+      idx = 0
+      while idx <= tmp.size - x
+        c = tmp[idx]
+        rej << c if tmp[idx+1..idx+x-1].all? { |i| i == c }
+        idx += 1 until (tmp[idx] != c || idx > tmp.size - x)
+      end
+      rej.compact!
+      rej.uniq!(&:to_s)
+      rej.each do |i|
+        out << a - i
+      end
+    end.flatten
+    # res = [].tap { |out| ((b.reject { |i| p 1; b.count(i) < x }).compact.uniq(&:to_s)).each { |i| p 2; out << a - i } }.flatten
     res.one? ? res.first : res
   end
 

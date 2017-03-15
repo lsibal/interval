@@ -54,7 +54,8 @@ describe Interval do
                  Interval.new(80,90)] }
       let(:x) { 2 }
 
-      it { should eq [Interval.new(1,50), Interval.new(1,79)] }
+      it { should include Interval.new(1,50) }
+      it { should include Interval.new(1,79) }
     end
 
     context 'Test #3' do
@@ -64,7 +65,8 @@ describe Interval do
                  Interval.new(12,34)] }
       let(:x) { 3 }
 
-      it { should eq [Interval.new(1,11), Interval.new(35,100)] }
+      it { should include Interval.new(1,11) }
+      it { should include Interval.new(35,100) }
     end
 
     context 'Test #4' do
